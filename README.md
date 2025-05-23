@@ -9,7 +9,6 @@ This repo is organized with 3 independent tutorials and a common set of basic me
 Tutorials.
 - `tuto_FEA/`: Finite Element Analysis tutorial scripts.
 - `tuto_exp/`: Experimental deformation data and scripts for model training and validation.
-- `tuto_embedding/`: Supervised training with a material embedding
 
 ## Requirements
 Requirements may vary on the tutorial. General requirements are:
