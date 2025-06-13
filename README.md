@@ -1,4 +1,4 @@
-# Physics-Augmented Neural Networks for 3D Unsupervised Mechanics
+# Physics-Augmented Neural Networks for 3D Unsupervised Learning
 
 This repository contains code and data for developing and using Physics-Augmented Neural Networks (PANN) aimed at modeling isotropic material behavior under deformation. It integrates TensorFlow neural network models with finite element analysis (FEA) and experimental deformation data.
 
