@@ -5,9 +5,6 @@ This repository contains code and data for developing and using Physics-Augmente
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
 - `PANN_lib/`: Core Python libraries for FEA functions, PANN and traditional models, mesh generation, and visualization.
-
-Tutorials.
-- `tuto_FEA/`: Finite Element Analysis tutorial scripts.
 - `tuto_exp/`: Experimental deformation data and scripts for model training and validation.
 
 ## Requirements
