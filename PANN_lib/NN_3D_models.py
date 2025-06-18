@@ -16,11 +16,9 @@ Three main models are implemented, P=M(F):
 
 """
 import tensorflow as tf
-from tensorflow.keras import layers,regularizers,initializers
+from tensorflow.keras import initializers, layers
 from tensorflow.keras.constraints import NonNeg
-from tensorflow.keras import layers
 import numpy as np
-
 
 
 #%%
@@ -35,35 +33,17 @@ def compute_inv_3D_isotropic(x):
         tf.Tensor: A tensor containing a set of invariants based on the input deformation gradient.
     """
     
-    
     x = tf.cast(x, tf.float64)
+    
     # Compute the right Cauchy-Green tensor C = F^T * F
     C = tf.linalg.matmul(tf.linalg.matrix_transpose(x), x)
-    
-    I  = tf.linalg.trace(C)
+    I1 = tf.linalg.trace(C)
     I2 = 0.5*(tf.math.square(tf.linalg.trace(C))-tf.linalg.trace(tf.linalg.matmul(C,C)))
+    I3 = tf.linalg.det(C)
     J  = tf.linalg.det(x)
     
-    # Return multiple invariants as a stack
-    # return tf.stack([I, J, -J, I2, 
-    #                  tf.math.square(J-1), 
-    #                  tf.math.log(J), I**2], axis=-1)
-    return tf.stack([I, J, -J, I2], axis=-1)
+    return tf.stack([I1, I2, I3, -2*J], axis=-1)
     
-
-# Function to compute growth energy (optional)
-def compute_growth(x):
-    """
-    Compute growth energy term based on the determinant of the deformation gradient.
-    
-    Args:
-        x (tf.Tensor): Input deformation gradient tensor of shape (3, 3).
-    Returns:
-        tf.Tensor: A scalar tensor representing the growth energy.
-    """
-    J  = tf.linalg.det(x)
-    return tf.math.square(J+1/J-2)
-
 
 # Function to compute growth energy (optional)
 def compute_growth(x):
@@ -82,7 +62,7 @@ def compute_growth(x):
 class inv_comp(layers.Layer):
     
     
-    def __init__(self, n=5, layer_num=5, **kwargs):
+    def __init__(self, n=8, layer_num=2, **kwargs):
         """
         Args:
             num_experiments (int): Total number of experiments.
@@ -97,24 +77,28 @@ class inv_comp(layers.Layer):
         self.invariant_layer = layers.Lambda(compute_inv_3D_isotropic, name="invariants")
 
         self.hidden_layers = []
+        positive_init = tf.keras.initializers.RandomUniform(minval=1e-3, maxval=0.1, seed=42)
+        
         for i in range(layer_num):
             self.hidden_layers.append(
                 layers.Dense(
                     units=n,
                     activation='softplus',
+                    kernel_initializer=positive_init,
                     kernel_constraint=NonNeg(),
                     name=f"hidden_{i}",
-                    kernel_initializer=initializers.GlorotUniform(seed=42),
                 )
             )
+            
 
         self.final_layer = layers.Dense(
             units=1,
             activation='softplus',
-            kernel_constraint=NonNeg(),
+            kernel_initializer=positive_init,
+            # kernel_constraint=NonNeg(),
             name="final_dense",
-            kernel_initializer=initializers.GlorotUniform(seed=42),
         )
+        
 
     def call(self, inputs):
         """
@@ -130,7 +114,6 @@ class inv_comp(layers.Layer):
 
         # Compute invariant features from the deformation gradient.
         inv_features = self.invariant_layer(F)
-        
         for layer in self.hidden_layers:
             inv_features = layer(inv_features)
 
@@ -139,24 +122,29 @@ class inv_comp(layers.Layer):
         # ---- Subtract identity energy ----
         batch_size = tf.shape(F)[0]
         
+        identity_F = tf.eye(3, dtype=F.dtype)[tf.newaxis, ...]
+        identity_inv = self.invariant_layer(identity_F)
         with tf.GradientTape() as tape:
-            identity_F = tf.tile(tf.expand_dims(tf.eye(3, dtype=F.dtype), axis=0), [batch_size, 1, 1])
-            tape.watch(identity_F)
-            # Manually compute energy at identity (same as identity_energy)
-            identity_features = self.invariant_layer(identity_F)
+            tape.watch(identity_inv)
+            identity_features = tf.identity(identity_inv)
             for layer in self.hidden_layers:
                 identity_features = layer(identity_features)
-            energy_identity = self.final_layer(identity_features) # this is pure W(I) + tf.expand_dims((tf.linalg.det(identity_F) + 1.0 / tf.linalg.det(identity_F) - 2.0) ** 2, axis=-1) 
+            energy_identity = self.final_layer(identity_features) 
         
-        H = -tape.gradient(energy_identity, identity_F)
-        # # Compute FᵀF - I
-        C = tf.matmul(tf.transpose(F, perm=[0, 2, 1]), F)
-        E = (C - tf.eye(3, batch_shape=[batch_size], dtype=F.dtype))/2  # (batch, 3, 3)
-        # Frobenius inner product H:C
-        correction = tf.reduce_sum(H * E, axis=[1, 2], keepdims=True)  # (batch, 1)
-        correction = tf.squeeze(correction, axis=-1)
+        H = tape.gradient(energy_identity, identity_inv)
+
+        nu = 2. * H * tf.stack([1.*tf.ones_like(H[:,0]), 
+                                2.*tf.ones_like(H[:,1]), 
+                                1.*tf.ones_like(H[:,2]), 
+                               -1.*tf.ones_like(H[:,3])
+                                ], axis=-1)
+        nu_red = tf.reduce_sum(nu , axis=[1], keepdims=True)
+        nu_red_tiled = tf.tile(nu_red, [batch_size, 1])
         
-        return energy - energy_identity + correction
+        J = tf.linalg.det(F)[:, tf.newaxis]
+        correction = nu_red_tiled * (J - 1.0)
+        
+        return energy - energy_identity - correction + (J+1/J-2)**2
  
       
 class DerivativeLayer(layers.Layer):
@@ -191,7 +179,6 @@ def main_PANN_3D(**kwargs):
     
     # Connect inputs and outputs to create the model
     model = tf.keras.Model(inputs = [xs], outputs = [ys,derivatives])
-
     return model
 
 
@@ -228,7 +215,6 @@ class Compute_Linear_Potentials(layers.Layer):
 
     def __init__(self, E, nu):
         super(Compute_Linear_Potentials, self).__init__()
-        # Calculate Lamé coefficients
         self.mu_nh = E / (2 * (1 + nu))  # Shear modulus (mu)
         self.lambda_nh = E * nu / ((1 + nu) * (1 - 2 * nu))  # Lamé's first parameter (lambda)
 
@@ -246,10 +232,10 @@ class Compute_Linear_Potentials(layers.Layer):
         # Compute the energy potential:
         trace_E = tf.linalg.trace(E_tensor)  
         
-        potential = self.mu_nh * tf.reduce_sum(E_tensor ** 2, axis=[1, 2]) + \
-                    (0.5*self.lambda_nh) * trace_E ** 2
+        W = self.mu_nh *tf.linalg.trace(E_tensor ** 2) + \
+            (0.5*self.lambda_nh) * trace_E ** 2
         
-        return potential
+        return W
     
 def linear_model(E, nu):
     
@@ -273,14 +259,21 @@ class Compute_NH_Potentials(layers.Layer):
         super(Compute_NH_Potentials, self).__init__()
         self.mu_nh = E / (2 * (1 + nu))
         self.lambda_nh = E * nu / ((1 + nu) * (1 - 2 * nu))
-
+        self.kappa = E / (3 * (1 - 2 * nu))
+        
     def call(self, x):
         inv = compute_inv_3D_isotropic(x)
-        I = inv[:, 0]
-        J = inv[:, 1]
+        I   = inv[:, 0]
+        J   = tf.sqrt(inv[:, 2])
 
         W = self.mu_nh / 2 * (I - 3) - self.mu_nh * tf.math.log(J) + \
             self.lambda_nh / 2 * tf.math.square(tf.math.log(J))
+            
+        # W = self.mu_nh / 2 * (I - 3) - self.mu_nh * tf.math.log(J) + \
+        #     self.lambda_nh / 2 * tf.math.square(J-1)
+            
+        # W = self.mu_nh / 2 * (I - 3) - self.mu_nh * tf.math.log(J) + \
+        #     self.kappa / 2 * tf.math.square(J-1)
 
         return W
 
@@ -297,50 +290,8 @@ def NH_model(E, nu):
 
     return model_gene
 
-#%%
-'''
-Additional invariant computation methods
-'''
 
-def matrix_log(C):
-    """
-    Compute a tensor log
-    """
 
-    eigenvalues, eigenvectors = tf.linalg.eigh(C)
-    log_eigenvalues = tf.math.log(eigenvalues)
-    log_diag = tf.linalg.diag(log_eigenvalues)
-    log_C = tf.matmul(eigenvectors, tf.matmul(log_diag, tf.linalg.matrix_transpose(eigenvectors)))
-    
-    return log_C
-
-def compute_K_inv(x):
-    """
-    Compute invariants of the right Cauchy-Green deformation tensor from F.
-    Returns a tensor of shape (..., 3): [I, J, -J].
-    
-    see: https://hal.science/hal-04292137v1/file/RCT_Costecalde_Verron_revised.pdf
-    """
-    # Ensure proper type casting
-    x2 = tf.cast(x,dtype=tf.float32)
-    
-    # Compute the right Cauchy-Green tensor: C = F^T * F
-    C = tf.linalg.matmul(x2,tf.linalg.matrix_transpose(x2))
-    
-    # Compute H as Hencky strain tensor
-    H = 0.5 * matrix_log(C)
-    
-    trace_H = tf.linalg.trace(H)              
-    trace_H = tf.reshape(trace_H, (-1, 1, 1))    
-    
-    # Compute the deviatoric part of H
-    devH =  H - (1/3) * trace_H * tf.eye(3, dtype=H.dtype)
-    
-    K1 = tf.linalg.trace(H) 
-    K2 = tf.sqrt(tf.reduce_sum(tf.square(devH), axis=[-2, -1]))
-    K3 = 3 * tf.sqrt(6.0) / (K2**3) * tf.linalg.det(devH)
-    
-    return tf.stack([K1, K2, K3], axis=-1)
 
 
 
