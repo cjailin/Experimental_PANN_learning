@@ -9,9 +9,51 @@ LMPS—Laboratoire de Mécanique Paris-Saclay,
 Gif-sur-Yvette,France
 """
 import tensorflow as tf
+import numpy as np
+import matplotlib as mpl
 
+# Default font sizes for Matplotlib plots.
+mpl.rcParams['axes.labelsize'] = 14   
+mpl.rcParams['axes.titlesize'] = 16   
+mpl.rcParams['xtick.labelsize'] = 14  
+mpl.rcParams['ytick.labelsize'] = 14  
+mpl.rcParams['legend.fontsize'] = 14  
+mpl.rcParams['font.size'] = 14  
 
 tf.keras.backend.set_floatx('float64')
+
+
+class Mesh:
+    """
+    Finite Element Mesh object with geometry, connectivity, and boundary detection.
+    """
+    def __init__(self, coordinates, connectivity):
+        self.coordinates = coordinates
+        self.connectivity = connectivity
+        self.coordx, self.coordy, self.coordz = self.coordinates.T
+
+        self.coords_tf = tf.constant(self.coordinates, dtype=tf.float64)
+        self.connect_tf = tf.constant(self.connectivity, dtype=tf.int32)
+
+        self.grad_N_all, self.volumes = precompute_gradients(self.coords_tf, self.connect_tf)
+
+        # Identify boundary and internal nodes
+        self.z_min = np.min(self.coordz)
+        self.z_max = np.max(self.coordz)
+        self.bottom_nodes = np.abs(self.coordz - self.z_min) < 0.15
+        self.top_nodes = np.abs(self.coordz - self.z_max) < 0.15
+        self.free_nodes_indices = np.where(~(self.bottom_nodes | self.top_nodes))[0]
+        self.top_nodes_indices = np.where(self.top_nodes)[0]
+        self.bottom_nodes_indices = np.where(self.bottom_nodes)[0]
+        self.num_nodes = coordinates.shape[0]
+    def __repr__(self):
+        return (
+            f"Mesh(num_nodes={self.num_nodes}, \n"
+            f"     num_elements={self.connectivity.shape[0]}, \n"
+            f"     top_nodes={len(self.top_nodes_indices)}, \n"
+            f"     bottom_nodes={len(self.bottom_nodes_indices)}, \n"
+            f"     free_nodes={len(self.free_nodes_indices)})"
+        )
 
 def compute_grad_N_and_volume(elem_coords):
     """
@@ -86,7 +128,7 @@ def compute_elem_gradient(inputs):
     return deformation_tensor
 
 
-def compute_deformation_tensor_from_U(U, T4, grad_N_all):
+def compute_deformation_tensor_from_U(U, mesh):
     """
     Compute deformation tensors from displacement fields.
 
@@ -94,18 +136,15 @@ def compute_deformation_tensor_from_U(U, T4, grad_N_all):
     ----------
     U : Tensor
         Displacement field tensor with shape (num_nodes, 3).
-    T4 : Tensor
-        Element connectivity array with shape (num_elements, 4).
-    grad_N_all : Tensor
-        Precomputed gradients of shape functions.
+    mesh : Mesh class
 
     Returns
     -------
     deformation_tensors : Tensor
         Deformation gradient tensors for all elements with shape (num_elements, 3, 3).
     """
-    elem_U = tf.gather(tf.transpose(U), T4)  # (num_elements, 4, 3)
-    deformation_tensors = tf.vectorized_map(compute_elem_gradient, (elem_U, grad_N_all))  # (num_elements, 3, 3)
+    elem_U = tf.gather(tf.transpose(U), mesh.connect_tf)  # (num_elements, 4, 3)
+    deformation_tensors = tf.vectorized_map(compute_elem_gradient, (elem_U, mesh.grad_N_all))  # (num_elements, 3, 3)
 
     return deformation_tensors
 
@@ -129,7 +168,7 @@ def compute_element_nodal_forces(inputs):
     return nodal_forces  # (4,3)
 
 
-def compute_global_nodal_forces(y_pred, T4, grad_N_all, volumes, num_nodes):
+def compute_global_nodal_forces(y_pred, mesh):
     """
     Compute global nodal forces from predicted stress tensors.
 
@@ -137,14 +176,7 @@ def compute_global_nodal_forces(y_pred, T4, grad_N_all, volumes, num_nodes):
     ----------
     y_pred : Tensor
         Predicted stress tensors for elements.
-    T4 : Tensor
-        Element connectivity array.
-    grad_N_all : Tensor
-        Precomputed shape function gradients for all elements.
-    volumes : Tensor
-        Volumes for all elements.
-    num_nodes : int
-        Total number of nodes in the mesh.
+    mesh: Mesh class
 
     Returns
     -------
@@ -155,12 +187,12 @@ def compute_global_nodal_forces(y_pred, T4, grad_N_all, volumes, num_nodes):
     
     elem_nodal_forces = tf.vectorized_map(
         compute_element_nodal_forces,
-        (grad_N_all, stress, volumes)
+        (mesh.grad_N_all, stress, mesh.volumes)
     )  # (num_elements, 4, 3)
 
-    global_nodal_forces = tf.zeros((num_nodes, 3), dtype=tf.float64)
+    global_nodal_forces = tf.zeros((mesh.num_nodes, 3), dtype=tf.float64)
 
-    indices = tf.reshape(T4, [-1])
+    indices = tf.reshape(mesh.connect_tf, [-1])
     forces = tf.reshape(elem_nodal_forces, [-1, 3])
 
     global_nodal_forces = tf.tensor_scatter_nd_add(
@@ -170,4 +202,6 @@ def compute_global_nodal_forces(y_pred, T4, grad_N_all, volumes, num_nodes):
     )
 
     return global_nodal_forces
+
+
 
