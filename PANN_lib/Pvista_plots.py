@@ -99,7 +99,7 @@ def plot_mesh_results(coordinates, connect, fields, titles, cmaps=None, arrows=N
 #%%
 
 
-def plot_single_mesh_result(coordinates, connect, field, title, cmap="plasma", arrows=None):
+def plot_single_mesh_result(mesh, field, title='', cmap="plasma", arrows=None, op=1, save=False):
     """
     Plots a mesh with a single field using PyVista. Automatically detects if the data
     is cell-based or point-based. Optionally plots arrows representing vectors.
@@ -129,37 +129,39 @@ def plot_single_mesh_result(coordinates, connect, field, title, cmap="plasma", a
     field = P_pred[:,2,2]  # Example field data
     arrows = global_nodal_forces  # Example arrows (forces)
 
-    plot_single_mesh_result(coordinates, connect, field, title="Stress Prediction", cmap="hot", arrows=arrows)
+    plot_single_mesh_result(mesh, field, title="Stress Prediction", cmap="hot", arrows=arrows)
     ______________________________________________
     
     """
-    # Build cells array: [4, node0, node1, node2, node3] for each tetrahedron
+    coordinates,connect = mesh.coordinates, mesh.connectivity
+    
     cells = np.hstack([np.insert(c, 0, 4) for c in connect]).astype(np.int64)
-    cell_types = np.full(len(connect), 10, dtype=np.uint8)  # type 10 for tetrahedron
+    cell_types = np.full(len(connect), 10, dtype=np.uint8)  # tetra
 
-    # Create the base grid (no deformation)
     grid = pv.UnstructuredGrid(cells, cell_types, coordinates)
+
+    # Set scalar field
+    if field.shape[0] == coordinates.shape[0]:
+        grid.point_data[title] = field
+    elif field.shape[0] == connect.shape[0]:
+        grid.cell_data[title] = field
+    else:
+        raise ValueError("Field size does not match node or element count.")
 
     plotter = pv.Plotter(window_size=(600, 600))
     plotter.add_text(title, font_size=12)
+    plotter.add_mesh(grid, scalars=title, cmap=cmap, show_edges=True, opacity=op)
 
-    # Determine if field is point data or cell data
-    if field.shape[0] == coordinates.shape[0]:
-        grid.point_data[title] = np.array(field)
-        plotter.add_mesh(grid, scalars=title, cmap=cmap, show_edges=True)
-    elif field.shape[0] == connect.shape[0]:
-        grid.cell_data[title] = np.array(field)
-        plotter.add_mesh(grid, scalars=title, cmap=cmap, show_edges=True)
-    else:
-        raise ValueError(f"Field '{title}' has incompatible shape.")
-
-    # Plot arrows if provided
     if arrows is not None:
         plotter.add_arrows(coordinates, np.array(arrows), mag=1.0, color="red")
+        plotter.add_arrows(coordinates, np.array(arrows), mag=1.0, color="red")
 
-    plotter.show(interactive_update=True)
-
-
+    if save:
+        plotter.show(interactive_update=True)
+        plotter.export_html(f"{title}.html")
+        print(f"Interactive HTML saved to: {title}.html")
+    else:
+        plotter.show(interactive_update=True)
 
 #%%
 
