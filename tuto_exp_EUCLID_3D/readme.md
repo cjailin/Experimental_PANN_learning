@@ -23,7 +23,3 @@ python Main_exp_EUCLID.py
 Below is an example DVC data:
 
 ![Displacement magnitude](step3.png)
-
-## Training different models
-
-![Training results](comp.png)
