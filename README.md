@@ -25,8 +25,3 @@ or
 ```bash
 conda install tensorflow numpy pandas pyvista gmsh matplotlib
 ```
-
-## PANN training on 3D experimental data
-
-<img src="res_exp.png" alt="Results of the PANN training on step 4" width="700"/>
-
