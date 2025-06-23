@@ -4,7 +4,7 @@ This repository contains code and data for developing and using Physics-Augmente
 
 Code and data used in:
 
-M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **3D learning of a hyperelastic behavior with experimental data**, submitted. 
+M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **3D learning of a hyperelastic behavior with experimental data**, submitted to publication. 
 
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
