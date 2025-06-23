@@ -132,8 +132,9 @@ plot_residual_forces(P_train_NH, mesh, "NH residual forces")
 '''
 PANN model
 '''
-# Initialize the PANN model
+# Initialize the PANN model with 8 neurons on the 2 hidden layers
 model = main_PANN_3D(n=8,layer_num=2)
+model.summary()
 
 # Define optimizer
 boundaries = [1000,   2500,  3000,       ]
@@ -142,7 +143,7 @@ lr_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(boundaries, v
 optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
 
 # Train the model
-max_epoch = 10000
+max_epoch = 5000
 losses = train_model(model, 
                      dataset_DVC, 
                      train_names=[TRAIN_NUM],
