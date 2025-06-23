@@ -74,8 +74,8 @@ Load and pre-process data
 '''
 
 # Load connectivity coordinates and apply scaling
-connectivity = pd.read_csv('DVC_data/connectivity_scan1.csv', header=None).values
-coordinates  = pd.read_csv('DVC_data/coordinates_scan1.csv' , header=None).values * VOXEL_SIZE
+connectivity = pd.read_csv('../DVC_data/connectivity_scan1.csv', header=None).values
+coordinates  = pd.read_csv('../DVC_data/coordinates_scan1.csv' , header=None).values * VOXEL_SIZE
 mesh         = Mesh(coordinates, connectivity)
 
 dataset_DVC = {}
