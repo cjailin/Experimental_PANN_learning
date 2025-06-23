@@ -5,13 +5,17 @@ Core functionalities supporting finite element analysis, mesh manipulation, neur
 
 ## Contents
 - `FEA_fun.py`: FEA methods for gradient computation and deformation analysis.
-- `FEA_mesh.py`: (optional) Mesh generation methods using gmsh.
 - `NN_3D_model.py`: TensorFlow implementation of constitutive models
     - PANN model
     - Saint-Venant-Kirchoff
     - Neo Hookean model
-    - invariant computation (I,J,I2,I3)
+    - invariant computation (I,I2,I3,-2J)
 - `Pvista_plots.py`: Visualization methods using PyVista.
+- `training_utils.py`: main trainng function
+- `utils.py`: general utility methods
+ 
+- `FEA_mesh.py`: (optional) Mesh generation methods using gmsh.
+
 
 ## Features
 - Precomputation of shape function gradients and deformation tensors
