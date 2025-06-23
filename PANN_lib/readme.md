@@ -5,7 +5,7 @@ Core functionalities supporting finite element analysis, mesh manipulation, neur
 
 ## Contents
 - `FEA_fun.py`: FEA methods for gradient computation and deformation analysis.
-- `FEA_mesh.py`: Mesh generation methods using gmsh.
+- `FEA_mesh.py`: (optional) Mesh generation methods using gmsh.
 - `NN_3D_model.py`: TensorFlow implementation of constitutive models
     - PANN model
     - Linear Elastic model
