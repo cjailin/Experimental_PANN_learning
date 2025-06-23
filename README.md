@@ -24,12 +24,13 @@ Requirements may vary on the tutorial. General requirements are:
   - gmsh (optional)
 
 ## Installation
+Create a virtual environement and install the required libraries:
 ```bash
-pip install tensorflow numpy pandas pyvista matplotlib
+pip install tensorflow matplotlib pandas pyvista tensorboard
 ```
 or
 ```bash
-conda install tensorflow numpy pandas pyvista matplotlib
+conda install tensorflow matplotlib pandas pyvista tensorboard
 ```
 
 ## Getting Started
