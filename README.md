@@ -15,12 +15,13 @@ This repo is organized with 2 independent tutorials and a common set of basic me
 ## Requirements
 Requirements may vary on the tutorial. General requirements are:
   - python >= 3.8
-  - tensorFlow >= 2.0
+  - tensorflow >= 2.0
   - pandas
   - pyVista
   - numPy
   - matplotlib
-  - (optional) gmsh
+  - tensorboard (optional for vizu)
+  - gmsh (optional)
 
 ## Installation
 ```bash
