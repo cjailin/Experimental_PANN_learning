@@ -82,7 +82,7 @@ dataset_DVC = {}
 for loading_step in ['1','2','3','4']:
     dataset_DVC[loading_step]={}
     dataset_DVC[loading_step]['force'] = forces[int(loading_step)-1]
-    dataset_DVC[loading_step]['displacement'] = load_displacement('DVC_data/displacements_scan'+loading_step+'-1.csv',VOXEL_SIZE)
+    dataset_DVC[loading_step]['displacement'] = load_displacement('../DVC_data/displacements_scan'+loading_step+'-1.csv',VOXEL_SIZE)
     dataset_DVC[loading_step]['deformation']  = compute_deformation_tensor_from_U(dataset_DVC[loading_step]['displacement'].T, mesh)
     dataset_DVC[loading_step]['K']  = compute_K_inv(dataset_DVC[loading_step]['deformation'])
 
