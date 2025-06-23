@@ -42,6 +42,7 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
     print("-------------------------------------------------------------------------------------------------------")
     print('start training')
     print(f"To view TensorBoard, run:\ntensorboard --logdir={os.path.abspath('logs/fit')}")
+    print("Then open http://localhost:6006 in your browser.")
     print("-------------------------------------------------------------------------------------------------------")
 
     plotter, grid, arrows_actor, mesh_actor = initialize_plot(
@@ -107,6 +108,7 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
     print("-------------------------------------------------------------------------------------------------------")
     print('end training')
     print(f"To view TensorBoard, run:\ntensorboard --logdir={os.path.abspath('logs/fit')}")
+    print("Then open http://localhost:6006 in your browser.")
     print("-------------------------------------------------------------------------------------------------------")
     
     return losses, val_losses
