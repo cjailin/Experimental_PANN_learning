@@ -4,24 +4,35 @@ This repository contains code and data for developing and using Physics-Augmente
 
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
-- `PANN_lib/`: Core Python libraries for FEA functions, PANN and traditional models, mesh generation, and visualization.
+- `PANN_lib/`: Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
 - `tuto_exp/`: Experimental deformation data and scripts for model training and validation.
 
 ## Requirements
 Requirements may vary on the tutorial. General requirements are:
-- Python >= 3.8
-- TensorFlow >= 2.0
-- NumPy
-- Pandas
-- PyVista
-- gmsh
-- matplotlib
+  - python >= 3.8
+  - tensorFlow >= 2.0
+  - pandas
+  - pyVista
+  - numPy
+  - matplotlib
+  - (optional) gmsh
 
 ## Installation
 ```bash
-pip install tensorflow numpy pandas pyvista gmsh matplotlib
+pip install tensorflow numpy pandas pyvista matplotlib
 ```
 or
 ```bash
-conda install tensorflow numpy pandas pyvista gmsh matplotlib
+conda install tensorflow numpy pandas pyvista matplotlib
 ```
+
+## Getting Started
+
+```bash
+cd tuto_exp_EUCLID_3D
+python Main_exp_EUCLID.py
+```
+
+---
+
+Feel free to contribute or open issues!
