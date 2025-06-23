@@ -5,7 +5,8 @@ This repository contains code and data for developing and using Physics-Augmente
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
 - `PANN_lib/`: Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
-- `tuto_exp/`: Experimental deformation data and scripts for model training and validation.
+- `DVC_data/*`: CSV files (`coordinates_scan1.csv`, `connectivity_scan1.csv`, `displacements_scan*.csv`) with the experimental datasets.
+- `3D_learning_core/`: Main scripts for model training and validation.
 
 ## Requirements
 Requirements may vary on the tutorial. General requirements are:
