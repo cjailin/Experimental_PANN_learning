@@ -6,6 +6,12 @@ Code and data used in:
 
 M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **3D learning of a hyperelastic behavior with experimental data**, submitted to publication. 
 
+
+[(NH residuals forces)](https://cjailin.github.io/html_outputs/3D_PANN_learning/NH_residual_forces.html)
+
+[(PANN residuals forces)](https://cjailin.github.io/html_outputs/3D_PANN_learning/PANN_residual_forces.html)
+
+
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
 - `PANN_lib/`: Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
