@@ -2,6 +2,10 @@
 
 This repository contains code and data for developing and using Physics-Augmented Neural Networks (PANN) aimed at modeling isotropic material behavior under deformation. It integrates TensorFlow neural network models with finite element analysis (FEA) and experimental deformation data.
 
+Code and data used in:
+
+M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **3D learning of a hyperelastic behavior with experimental data**, submitted. 
+
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
 - `PANN_lib/`: Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
