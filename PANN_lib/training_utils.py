@@ -12,6 +12,7 @@ import numpy as np
 import tensorflow as tf
 import datetime
 from tensorflow.keras.callbacks import TensorBoard
+import os
 
 from FEA_fun import (
     compute_global_nodal_forces,
@@ -38,6 +39,11 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
         list: Loss values over epochs.
     """
     
+    print("-------------------------------------------------------------------------------------------------------")
+    print('start training')
+    print(f"To view TensorBoard, run:\ntensorboard --logdir={os.path.abspath('logs/fit')}")
+    print("-------------------------------------------------------------------------------------------------------")
+
     plotter, grid, arrows_actor, mesh_actor = initialize_plot(
         mesh.coordinates, mesh.connectivity, 
         initial_field=np.zeros((mesh.num_nodes,3)) ,
@@ -98,4 +104,9 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
                 tf.summary.scalar('Metrics/BC_valid', bc_v, step=epoch)
                 tf.summary.scalar('Metrics/ME_valid', me_v, step=epoch)
 
+    print("-------------------------------------------------------------------------------------------------------")
+    print('end training')
+    print(f"To view TensorBoard, run:\ntensorboard --logdir={os.path.abspath('logs/fit')}")
+    print("-------------------------------------------------------------------------------------------------------")
+    
     return losses, val_losses
