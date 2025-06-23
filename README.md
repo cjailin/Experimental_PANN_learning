@@ -20,7 +20,7 @@ Requirements may vary on the tutorial. General requirements are:
   - pyVista
   - numPy
   - matplotlib
-  - tensorboard (optional for vizu)
+  - tensorboard (optional for monitoring)
   - gmsh (optional)
 
 ## Installation
