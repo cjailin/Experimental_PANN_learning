@@ -8,9 +8,9 @@ Core functionalities supporting finite element analysis, mesh manipulation, neur
 - `FEA_mesh.py`: (optional) Mesh generation methods using gmsh.
 - `NN_3D_model.py`: TensorFlow implementation of constitutive models
     - PANN model
-    - Linear Elastic model
+    - Saint-Venant-Kirchoff
     - Neo Hookean model
-    - invariant computation (I,J,I2 and also K1, K2, K3)
+    - invariant computation (I,J,I2,I3)
 - `Pvista_plots.py`: Visualization methods using PyVista.
 
 ## Features
