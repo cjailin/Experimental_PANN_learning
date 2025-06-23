@@ -1,5 +1,5 @@
 
-# Physics-Augmented Neural Networks Library
+# Physics-Augmented Neural Networks library
 
 Core functionalities supporting finite element analysis, mesh manipulation, neural network models, and visualization.
 
@@ -15,7 +15,6 @@ Core functionalities supporting finite element analysis, mesh manipulation, neur
 - `utils.py`: general utility methods
  
 - `FEA_mesh.py`: (optional) Mesh generation methods using gmsh.
-
 
 ## Features
 - Precomputation of shape function gradients and deformation tensors
