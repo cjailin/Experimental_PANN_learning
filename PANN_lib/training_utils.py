@@ -10,6 +10,8 @@ Gif-sur-Yvette,France
 """
 import numpy as np
 import tensorflow as tf
+import datetime
+from tensorflow.keras.callbacks import TensorBoard
 
 from FEA_fun import (
     compute_global_nodal_forces,
@@ -42,7 +44,11 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
         title="Forces - PANN model", 
         cmap="hot",
         initial_arrows=np.zeros((mesh.num_nodes,3 )))
-    
+
+    # Create a logs directory with timestamp
+    log_dir = f"logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    summary_writer = tf.summary.create_file_writer(log_dir)
+
     losses=[]
     val_losses=[]
     for epoch in range(epochs):
@@ -60,7 +66,11 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
 
         loss_epoch = np.mean(loss_step)
         losses.append(loss_epoch) 
-        
+
+        # tensorboard output
+        with summary_writer.as_default():
+            tf.summary.scalar('Loss/train', loss_epoch, step=epoch)
+    
         # Print every xx epochs
         if epoch % 100==0:
             
@@ -82,5 +92,10 @@ def train_model(model, dataset_DVC, train_names, valid_name, epochs, optimizer, 
             print(f"{epoch:5d} || "
                   f"{lt:10.1f} | {bc_t:12.2f} | {me_t:16.3f} || "
                   f"{lv:10.1f} | {bc_v:12.2f} | {me_v:15.3f}")
+            
+            with summary_writer.as_default():
+                tf.summary.scalar('Loss/valid', loss_val, step=epoch)
+                tf.summary.scalar('Metrics/BC_valid', bc_v, step=epoch)
+                tf.summary.scalar('Metrics/ME_valid', me_v, step=epoch)
 
     return losses, val_losses
