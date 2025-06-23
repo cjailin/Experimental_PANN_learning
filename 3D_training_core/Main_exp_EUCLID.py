@@ -65,7 +65,7 @@ forces        = [280,590,863,1110] # Loading forces
 GRID_SAMPLING = 15
 
 TRAIN_NUM = '4'
-VALID_NUM = '3'
+VALID_NUMS = ['3','2','1']
 
 
 #%%
@@ -100,7 +100,7 @@ min_loss_LE, E_opt_LE, nu_opt_LE = find_optimal_parameters(loss_LE_grid, E_range
 LE_model_ = NH_model(E_opt_LE, nu_opt_LE)
 print(f"LE model -- Train Loss: {min_loss_LE:.2f} N², E: {E_opt_LE:.2f} MPa, nu: {nu_opt_LE:.3f}")
 
-for valid_num in ['3','2','1']:
+for valid_num in VALID_NUMS:
     loss_valid_LE, P_valid_LE = evaluate_model(linear_model,mesh, E_opt_LE, nu_opt_LE, dataset_DVC[valid_num], "LE valid "+valid_num)
     print(f"LE model -- Valid loss {valid_num}: {loss_valid_LE:.2f} N²")
 
@@ -121,7 +121,7 @@ min_loss_NH, E_opt_NH, nu_opt_NH = find_optimal_parameters(loss_NH_grid, E_range
 NH_model_ = NH_model(E_opt_NH, nu_opt_NH)
 print(f"NH model -- Train Loss: {min_loss_NH:.2f} N², E: {E_opt_NH:.2f} MPa, nu: {nu_opt_NH:.3f}")
 
-for valid_num in ['3','2','1']:
+for valid_num in VALID_NUMS:
     loss_valid_NH, P_valid_NH = evaluate_model(NH_model,mesh, E_opt_NH, nu_opt_NH, dataset_DVC[valid_num], "NH valid" + valid_num)
     print(f"NH model -- Valid loss {valid_num}: {loss_valid_NH:.2f} N²")
 
@@ -147,7 +147,7 @@ max_epoch = 5000
 losses = train_model(model, 
                      dataset_DVC, 
                      train_names=[TRAIN_NUM],
-                     valid_name=VALID_NUM, 
+                     valid_name='3', 
                      epochs=max_epoch, 
                      optimizer=optimizer, 
                      mesh=mesh)
@@ -163,7 +163,7 @@ print(f'Model saved to: saved_models/{model_save_path}')
 
 plt.figure()
 plt.semilogy(np.array(range(0,max_epoch,1)),losses[0],label='training - step '+str(TRAIN_NUM) )
-plt.semilogy(np.linspace(0,max_epoch,len(losses[1])),losses[1],label='Evaluation - step '+str(VALID_NUM))
+plt.semilogy(np.linspace(0,max_epoch,len(losses[1])),losses[1],label='Evaluation - step 3')
 plt.xlabel('Epochs')
 plt.ylabel('EUCLID loss')
 plt.legend()
@@ -174,24 +174,24 @@ plt.show()
 #%%
 print("Name         || Loss error |  BC error [N] | ME_int error [N] || Num neg. W ||")
 print('----------------')
-for VALID_NUM in ['4','3','2','1']:
+for valid_num in ['4','3','2','1']:
 
-    W_LE,P_LE = LE_model_(dataset_DVC[VALID_NUM]['deformation'])
-    loss_val,metrics_LE   = divergence_loss_PANN_3D(P_LE, mesh, dataset_DVC[VALID_NUM]['force'])
+    W_LE,P_LE = LE_model_(dataset_DVC[valid_num]['deformation'])
+    loss_val,metrics_LE   = divergence_loss_PANN_3D(P_LE, mesh, dataset_DVC[valid_num]['force'])
     lt, bc_t, me_t = metrics_LE   
-    print(f"{str('LE   - step'+VALID_NUM)} || "
+    print(f"{str('LE   - step'+valid_num)} || "
           f"{lt:10.1f} | {bc_t:13.2f} | {me_t:16.3f} || {int(sum(W_LE.numpy()<0)):10.0f} ||")
     
-    W_NH,P_NH = NH_model_(dataset_DVC[VALID_NUM]['deformation'])
-    loss_val,metrics_NH   = divergence_loss_PANN_3D(P_NH, mesh, dataset_DVC[VALID_NUM]['force'])
+    W_NH,P_NH = NH_model_(dataset_DVC[valid_num]['deformation'])
+    loss_val,metrics_NH   = divergence_loss_PANN_3D(P_NH, mesh, dataset_DVC[valid_num]['force'])
     lt, bc_t, me_t = metrics_NH   
-    print(f"{str('NH   - step'+VALID_NUM)} || "
+    print(f"{str('NH   - step'+valid_num)} || "
           f"{lt:10.1f} | {bc_t:13.2f} | {me_t:16.3f} || {int(sum(W_NH.numpy()<0)):10.0f} ||")
     
-    W_NN,P_NN = model(dataset_DVC[VALID_NUM]['deformation'], training=True)
-    loss_val,metrics_NN   = divergence_loss_PANN_3D(P_NN, mesh, dataset_DVC[VALID_NUM]['force'])
+    W_NN,P_NN = model(dataset_DVC[valid_num]['deformation'], training=True)
+    loss_val,metrics_NN   = divergence_loss_PANN_3D(P_NN, mesh, dataset_DVC[valid_num]['force'])
     lt, bc_t, me_t = metrics_NN   
-    print(f"{str('PANN - step'+VALID_NUM)} || "
+    print(f"{str('PANN - step'+valid_num)} || "
           f"{lt:10.1f} | {bc_t:13.2f} | {me_t:16.3f} || {int(sum(W_NN.numpy()<0)):10.0f} ||")
     print('----------------')
 
