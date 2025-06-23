@@ -1,5 +1,5 @@
 
-# Experimental Data Analysis Tutorial
+# Experimental learning from 3D data
 
 This folder contains scripts and datasets for analyzing experimental deformation data and training PANN models to predict stress and deformation.
 
