@@ -5,7 +5,6 @@ This folder contains scripts and datasets for analyzing experimental deformation
 
 ## Contents
 - `Main_exp_EUCLID.py`: Script for training and validating PANN models using 3D experimental data.
-- DVC_data/*: CSV files (`coordinates_scan1.csv`, `connectivity_scan1.csv`, `displacements_scan*.csv`) with the experimental datasets.
 
 ## Running the Script
 ```bash
