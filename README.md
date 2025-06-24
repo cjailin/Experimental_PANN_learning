@@ -21,24 +21,24 @@ This repo is organized with 2 independent tutorials and a common set of basic me
 - `3D_learning_core/`: Main scripts for model training and validation.
 
 ## Requirements
-Requirements may vary on the tutorial. General requirements are:
   - python >= 3.8
   - tensorflow >= 2.0
   - pandas
-  - pyVista
-  - numPy
+  - pyvista
+  - numpy
   - matplotlib
+  - seaborn
   - tensorboard (optional for monitoring)
   - gmsh (optional)
 
 ## Installation
-Create a virtual environement and install the required libraries:
+Create a virtual environment and install the required libraries:
 ```bash
-pip install tensorflow matplotlib pandas pyvista tensorboard
+pip install tensorflow matplotlib numpy pandas pyvista seaborn tensorboard
 ```
 or
 ```bash
-conda install tensorflow matplotlib pandas pyvista tensorboard
+conda install tensorflow matplotlib numpy pandas pyvista seaborn tensorboard
 ```
 
 ## Getting Started
