@@ -49,4 +49,4 @@ python Main_exp_EUCLID.py
 
 ---
 
-Feel free to contribute or open issues!
+Feel free to contribute, start a Github discussion, or open issues!
