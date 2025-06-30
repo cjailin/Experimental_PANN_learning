@@ -29,7 +29,6 @@ This repo is organized with 2 independent tutorials and a common set of basic me
   - matplotlib
   - seaborn
   - tensorboard (optional for monitoring)
-  - gmsh (optional)
 
 ## Installation
 Create a virtual environment and install the required libraries:
