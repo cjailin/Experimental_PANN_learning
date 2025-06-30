@@ -31,7 +31,7 @@ This repo is organized with 2 independent tutorials and a common set of basic me
   - tensorboard (optional for monitoring)
 
 ## Installation
-Create a virtual environment and install the required libraries:
+Create a [virtual environment](https://docs.python.org/3/library/venv.html) and install the required libraries:
 ```bash
 pip install tensorflow matplotlib numpy pandas pyvista seaborn tensorboard
 ```
