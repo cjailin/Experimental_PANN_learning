@@ -20,9 +20,28 @@ M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **Le
 
 ## Repository Structure
 This repo is organized with 2 independent tutorials and a common set of basic methods (PANN_lib).
-- `PANN_lib/`: Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
-- `DVC_data/*`: CSV files (`coordinates_scan1.csv`, `connectivity_scan1.csv`, `displacements_scan*.csv`) with the experimental datasets.
-- `3D_learning_core/`: Main scripts for model training and validation.
+``` bash
+├───3D_learning_core
+│   └───Main_exp_EUCLID.py
+├───DVC_data
+│   ├───connectivity_scan1.csv
+│   └───coordinates_scan1.csv
+│   └───displacements_scan1-1.csv
+│   └───displacements_scan2-1.csv
+│   └───displacements_scan3-1.csv
+│   └───displacements_scan4-1.csv
+├───PANN_lib
+│   ├───FEA_fun.py
+│   ├───FEA_mesh.py
+│   └───NN_3D_models.py
+│   ├───Pvista_plots.py
+│   ├───training_utils.py
+│   └───utils.py
+```
+
+- [`PANN_lib/`](/PANN_lib/): Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
+- [`DVC_data/`](/DVC_data/): CSV files (`coordinates_scan1.csv`, `connectivity_scan1.csv`, `displacements_scan*.csv`) with the experimental datasets.
+- [`3D_learning_core/`](/3D_learning_core/): Main scripts for model training and validation.
 
 ## Requirements
   - python >= 3.8
