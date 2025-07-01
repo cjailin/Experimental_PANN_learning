@@ -39,9 +39,10 @@ This repo is organized with 2 independent tutorials and a common set of basic me
 │   └───utils.py
 ```
 
-- [`PANN_lib/`](/PANN_lib/): Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
-- [`DVC_data/`](/DVC_data/): CSV files (`coordinates_scan1.csv`, `connectivity_scan1.csv`, `displacements_scan*.csv`) with the experimental datasets.
 - [`3D_training_core/`](/3D_training_core/): Main scripts for model training and validation.
+- [`DVC_data/`](/DVC_data/): CSV files (`coordinates_scan1.csv`, `connectivity_scan1.csv`, `displacements_scan*.csv`) with the experimental datasets.
+- [`PANN_lib/`](/PANN_lib/): Core Python libraries for FEA functions, PANN, and traditional models, training, and visualization.
+
 
 ## Requirements
   - python >= 3.8
