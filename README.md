@@ -1,12 +1,16 @@
+# Learning a hyperelastic constitutive model from 3D experimental data
+
 This work was conducted at Université Paris-Saclay, CentraleSupélec, ENS Paris-Saclay, CNRS, LMPS – Laboratoire de Mécanique Paris-Saclay, Gif-sur-Yvette, France.
 
-# Physics-Augmented Neural Networks for 3D unsupervised learning
+![Static Badge](https://img.shields.io/badge/Python-blue)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-GPL--3.0-lightgrey.svg)](LICENSE.md)
+
 
 This repository contains code and data for developing and using Physics-Augmented Neural Networks (PANN) aimed at modeling isotropic hyperelastic material behavior. It integrates TensorFlow neural network models with finite element analysis (FEA) and experimental displacement data obtained from DVC.
 
 Code and data used in:
 
-M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **3D learning of a hyperelastic behavior with experimental data**, submitted to publication. 
+M. Bourdyot, M. Compans, R. Langlois, B. Smaniotto, E. Baranger, C. Jailin, **Learning a hyperelastic constitutive model from 3D experimental data**, submitted to publication. 
 
 
 [(NH residuals forces)](https://cjailin.github.io/html_outputs/3D_PANN_learning/NH_residual_forces.html)
